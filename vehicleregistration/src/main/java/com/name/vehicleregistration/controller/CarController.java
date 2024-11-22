@@ -37,7 +37,7 @@ public class CarController {
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<CarResponse> addCar(@RequestBody CarRequest carRequest) {
-        Car car = carService.addCar(carMapper.toModel(carRequest));
+        Car car = carService.addCar(carRequest);
         CarResponse carResponse = carMapper.toResponse(car);
         return ResponseEntity.ok(carResponse);
     }
@@ -64,7 +64,7 @@ public class CarController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/put/{id}")
     public ResponseEntity<CarResponse> putCar (@PathVariable Integer id, @RequestBody CarRequest carRequest){
-        CarResponse carResponse = carMapper.toResponse(carService.updateCar(id, carMapper.toModel(carRequest)));
+        CarResponse carResponse = carMapper.toResponse(carService.updateCar(id, carRequest));
         return ResponseEntity.ok(carResponse);
     }
 

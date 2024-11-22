@@ -1,11 +1,9 @@
-package com.name.vehicleregistration.service.convertes;
+package com.name.vehicleregistration.service.converters;
 
 import com.name.vehicleregistration.entity.BrandEntity;
 import com.name.vehicleregistration.entity.CarEntity;
 import com.name.vehicleregistration.model.Brand;
 import com.name.vehicleregistration.model.Car;
-import com.name.vehicleregistration.service.converters.BrandConverter;
-import com.name.vehicleregistration.service.converters.CarConverter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

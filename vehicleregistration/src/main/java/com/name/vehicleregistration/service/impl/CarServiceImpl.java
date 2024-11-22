@@ -1,5 +1,6 @@
 package com.name.vehicleregistration.service.impl;
 
+import com.name.vehicleregistration.controller.dtos.CarRequest;
 import com.name.vehicleregistration.entity.BrandEntity;
 import com.name.vehicleregistration.entity.CarEntity;
 import com.name.vehicleregistration.exception.custom.car.*;
@@ -42,21 +43,21 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public Car addCar(Car car) {
-        BrandEntity brandEntity = brandRepository.findById(car.getBrand().getId())
-                .orElseThrow(() -> new BrandNotFoundException("Marca con ID " + car.getBrand().getId() + " no encontrada."));
+    public Car addCar(CarRequest carRequest) {
+        BrandEntity brandEntity = brandRepository.findById(carRequest.getBrandId())
+                .orElseThrow(() -> new BrandNotFoundException("Marca con ID " + carRequest.getBrandId() + " no encontrada."));
 
         // Crear el CarEntity usando el BrandEntity encontrado
         CarEntity carEntity = CarEntity.builder()
                 .brand(brandEntity)
-                .model(car.getModel())
-                .milleage(car.getMilleage())
-                .price(car.getPrice())
-                .modelYear(car.getModelYear())
-                .description(car.getDescription())
-                .colour(car.getColour())
-                .fuelType(car.getFuelType())
-                .numDoors(car.getNumDoors())
+                .model(carRequest.getModel())
+                .milleage(carRequest.getMilleage())
+                .price(carRequest.getPrice())
+                .modelYear(carRequest.getModelYear())
+                .description(carRequest.getDescription())
+                .colour(carRequest.getColour())
+                .fuelType(carRequest.getFuelType())
+                .numDoors(carRequest.getNumDoors())
                 .build();
         carEntity = carRepository.save(carEntity);
         log.info("POST -> Coche añadido correctamente");
@@ -72,24 +73,24 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public Car updateCar(Integer id, Car car) {
+    public Car updateCar(Integer id, CarRequest carRequest) {
         CarEntity carEntity = carRepository.findById(id)
                 .orElseThrow(() -> new CarNotFoundException("Coche con ID " + id + " no encontrado."));
 
-        Optional<BrandEntity> brandOptional = brandRepository.findById(car.getBrand().getId());
+        Optional<BrandEntity> brandOptional = brandRepository.findById(carRequest.getBrandId());
         if (brandOptional.isEmpty()) {
-            throw new BrandNotFoundException("Marca con ID " + car.getBrand().getId() + " no encontrada.");
+            throw new BrandNotFoundException("Marca con ID " + carRequest.getBrandId() + " no encontrada.");
         }
         BrandEntity brandEntity = brandOptional.get();
         carEntity.setBrand(brandEntity);
-        carEntity.setModel(car.getModel());
-        carEntity.setMilleage(car.getMilleage());
-        carEntity.setPrice(car.getPrice());
-        carEntity.setModelYear(car.getModelYear());
-        carEntity.setDescription(car.getDescription());
-        carEntity.setColour(car.getColour());
-        carEntity.setFuelType(car.getFuelType());
-        carEntity.setNumDoors(car.getNumDoors());
+        carEntity.setModel(carRequest.getModel());
+        carEntity.setMilleage(carRequest.getMilleage());
+        carEntity.setPrice(carRequest.getPrice());
+        carEntity.setModelYear(carRequest.getModelYear());
+        carEntity.setDescription(carRequest.getDescription());
+        carEntity.setColour(carRequest.getColour());
+        carEntity.setFuelType(carRequest.getFuelType());
+        carEntity.setNumDoors(carRequest.getNumDoors());
 
         carRepository.save(carEntity);
         log.info("PUT -> Coche actualizado correctamente");

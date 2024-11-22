@@ -1,5 +1,6 @@
 package com.name.vehicleregistration.service.impl;
 
+import com.name.vehicleregistration.controller.dtos.CarRequest;
 import com.name.vehicleregistration.controller.mappers.BrandMapper;
 import com.name.vehicleregistration.entity.BrandEntity;
 import com.name.vehicleregistration.entity.CarEntity;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CarServiceImplTest {
+class CarServiceImplTest {
     @InjectMocks
     private CarServiceImpl carService;
     @Mock
@@ -53,6 +53,11 @@ public class CarServiceImplTest {
                 .country("Country")
                 .build();
 
+        CarRequest carRequest = CarRequest.builder()
+                .brandId(1)
+                .model("Model X")
+                .build();
+
         Car car = Car.builder()
                 .brand(brand)
                 .model("Model X")
@@ -74,7 +79,7 @@ public class CarServiceImplTest {
         when(brandRepository.findById(1)).thenReturn(Optional.of(brandEntity));
         when(carRepository.save(carEntity)).thenReturn(carEntitySaved);
         when(carConverter.toModel(carEntitySaved)).thenReturn(car);
-        Car result = carService.addCar(car);
+        Car result = carService.addCar(carRequest);
 
         // Then
         assertNotNull(result);
@@ -85,21 +90,15 @@ public class CarServiceImplTest {
     @Test
     void addCar_ko() {
         // Given
-        Brand brand = Brand.builder()
-                .id(1)
-                .name("BrandName")
-                .country("Country")
-                .build();
-
-        Car car = Car.builder()
-                .brand(brand)
+        CarRequest carRequest = CarRequest.builder()
+                .brandId(1)
                 .build();
 
         // When
         when(brandRepository.findById(1)).thenReturn(Optional.empty());
 
         // Then
-        BrandNotFoundException exception = assertThrows(BrandNotFoundException.class, () -> carService.addCar(car));
+        BrandNotFoundException exception = assertThrows(BrandNotFoundException.class, () -> carService.addCar(carRequest));
         assertEquals("Marca con ID 1 no encontrada.", exception.getMessage());
     }
 
@@ -133,38 +132,17 @@ public class CarServiceImplTest {
     }
 
     @Test
-    void getCarById_ko_BrandDoesNotExist() {
-        // Given
-        Brand brand = new Brand();
-        brand.setId(1);
-
-        Car car = new Car();
-        car.setId(1);
-        car.setModel("Model X");
-        car.setBrand(brand);
-
-        CarEntity carEntity = new CarEntity();
-        carEntity.setId(1);
-
-        // When
-        when(carRepository.findById(1)).thenReturn(Optional.of(carEntity));
-        when(brandRepository.findById(1)).thenReturn(Optional.empty());
-
-        // Then
-        BrandNotFoundException exception = assertThrows(BrandNotFoundException.class, () -> carService.updateCar(1, car)        );
-
-    }
-
-
-
-
-    @Test
     void updateCar_test() {
         // Given
         Brand brand = Brand.builder()
                 .id(1)
                 .name("BrandName")
                 .country("Country")
+                .build();
+
+        CarRequest carRequest = CarRequest.builder()
+                .brandId(1)
+                .model("Updated Model")
                 .build();
 
         Car car = new Car();
@@ -180,7 +158,7 @@ public class CarServiceImplTest {
         when(brandRepository.findById(1)).thenReturn(Optional.of(brandEntity));
         when(carRepository.save(carEntity)).thenReturn(carEntity);
         when(carConverter.toModel(carEntity)).thenReturn(car);
-        Car result = carService.updateCar(1, car);
+        Car result = carService.updateCar(1, carRequest);
 
         // Then
         assertNotNull(result);
@@ -194,7 +172,27 @@ public class CarServiceImplTest {
         when(carRepository.findById(1)).thenReturn(Optional.empty());
 
         // Then
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.getCarById(1));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.updateCar(1,new CarRequest()));
+    }
+
+    @Test
+    void updateCar_ko_BrandDoesNotExist() {
+        // Given
+        CarRequest carRequest = CarRequest.builder()
+                .brandId(1)
+                .model("Model X")
+                .build();
+
+        CarEntity carEntity = new CarEntity();
+        carEntity.setId(1);
+
+        // When
+        when(carRepository.findById(1)).thenReturn(Optional.of(carEntity));
+        when(brandRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Then
+        BrandNotFoundException exception = assertThrows(BrandNotFoundException.class, () -> carService.updateCar(1,carRequest));
+
     }
 
     @Test
@@ -221,7 +219,7 @@ public class CarServiceImplTest {
         when(carRepository.findById(1)).thenReturn(Optional.empty());
 
         // Then
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.getCarById(1));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.deleteById(1));
     }
 
 }
