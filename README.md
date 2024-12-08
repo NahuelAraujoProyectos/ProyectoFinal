@@ -1,6 +1,6 @@
-# ProyectoFinal# Vehicle Registration API
+# ProyectoFinal - Vehicle Registration API
 
-Una API RESTful desarrollada con **Spring Boot** para la gestión de usuarios y registros de vehículos. Este proyecto incluye autenticación, roles de usuario y persistencia en una base de datos MySQL. Ideal para aprender o desarrollar sistemas similares en producción.
+Una API RESTful desarrollada con **Spring Boot** para la gestión de usuarios y registros de vehículos. Este proyecto incluye autenticación, roles de usuario y persistencia en una base de datos **H2** en memoria. Ideal para aprender o desarrollar sistemas similares en entornos de desarrollo.
 
 ## Tabla de Contenidos
 - [Descripción](#descripción)
@@ -51,20 +51,27 @@ Asegúrate de tener lo siguiente instalado en tu máquina:
    Contraseña: password
    Desde la consola puedes consultar las tablas y datos.
 
-## Uso
+## Uso -Endpoints principales
 
-Endpoints principales
 Autenticación
-    POST /api/auth/register: Registra un nuevo usuario.
-    POST /api/auth/login: Inicia sesión y obtiene un token JWT.
+- POST /signup: Registra un nuevo usuario.
+    - Body: Datos del nuevo usuario (nombre, correo, contraseña, rol).
+- POST /login: Inicia sesión y obtiene un token JWT para la autenticación.
+    - Body: Credenciales del usuario (correo y contraseña).
 
 Gestión de usuarios
-    GET /api/users: Lista todos los usuarios (admin).
-    GET /api/users/{id}: Obtiene un usuario por ID.
+- GET /users/get/me: Obtiene los datos del perfil del usuario autenticado.
+- GET /users/get/{id}: Obtiene un perfil de usuario por su ID (solo accesible para administradores).
 
 Gestión de vehículos
-    POST /api/vehicles: Crea un registro de vehículo.
-    GET /api/vehicles: Lista todos los vehículos.
+- POST /cars/add: Agrega un nuevo vehículo al sistema.
+    - Body: Información del vehículo (marca, modelo, año, etc.).
+- GET /cars/get/{id}: Obtiene los detalles de un vehículo por su ID.
+
+Roles y permisos:
+- ADMIN: Accede a todos los endpoints, incluyendo la gestión de usuarios y vehículos.
+- CLIENT: Puede gestionar su propio perfil y vehículos, pero no tiene acceso a la administración global de usuarios o vehículos.
+Cada endpoint está protegido y requiere autenticación mediante el token JWT obtenido al hacer login.
 
 ## Documentación con Swagger
 Swagger UI está habilitado para documentar y probar la API. 
