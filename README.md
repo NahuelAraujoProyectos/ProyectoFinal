@@ -39,14 +39,16 @@ Asegúrate de tener lo siguiente instalado en tu máquina:
    cd vehicleregistration
 
 2. Construye y ejecuta el proyecto:
-    ./mvnw spring-boot:run
+   ```bash
+   ./mvnw spring-boot:run
 
-3. Accede a la consola de la base de datos H2 en tu navegador:
-    URL: http://localhost:8080/h2-console
-    JDBC URL: jdbc:h2:mem:testdb
-    Usuario: sa
-    Contraseña: (deja este campo vacío)
-    Desde la consola puedes consultar las tablas y datos.
+4. Accede a la consola de la base de datos H2 en tu navegador:
+   ```bash
+   URL: http://localhost:8080/h2-console
+   JDBC URL: jdbc:h2:mem:testdb
+   Usuario: sa
+   Contraseña: (deja este campo vacío)
+   Desde la consola puedes consultar las tablas y datos.
 
 ## Uso
 
@@ -73,17 +75,21 @@ Gestión de vehículos
     git fork https://github.com/yourusername/vehicleregistration.git
 
 2. Clona tu repositorio forkeado en tu máquina local:
-    git clone https://github.com/yourusername/vehicleregistration.git
-    cd vehicleregistration
+   ```bash
+   git clone https://github.com/yourusername/vehicleregistration.git
+   cd vehicleregistration
 
-3. Crea una nueva rama para tu funcionalidad o corrección de errores:
-    git checkout -b feature/nueva-funcionalidad
+4. Crea una nueva rama para tu funcionalidad o corrección de errores:
+   ```bash
+   git checkout -b feature/nueva-funcionalidad
 
-4. Realiza los cambios necesarios y haz un commit:
-    git add .
-    git commit -m "Añadida nueva funcionalidad"
+6. Realiza los cambios necesarios y haz un commit:
+   ```bash
+   git add .
+   git commit -m "Añadida nueva funcionalidad"
 
-5. Sube tu rama al repositorio remoto:
-    git push origin feature/nueva-funcionalidad
+8. Sube tu rama al repositorio remoto:
+   ```bash
+   git push origin feature/nueva-funcionalidad
 
-6. Abre un Pull Request desde tu repositorio forkeado hacia el repositorio principal.
+10. Abre un Pull Request desde tu repositorio forkeado hacia el repositorio principal.
