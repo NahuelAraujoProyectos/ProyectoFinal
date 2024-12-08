@@ -3,12 +3,15 @@ package com.name.vehicleregistration.service.impl;
 import com.name.vehicleregistration.controller.dtos.CarRequest;
 import com.name.vehicleregistration.entity.BrandEntity;
 import com.name.vehicleregistration.entity.CarEntity;
-import com.name.vehicleregistration.exception.custom.car.*;
+import com.name.vehicleregistration.exception.car.BrandNotFoundException;
+import com.name.vehicleregistration.exception.car.CarNotFoundException;
+import com.name.vehicleregistration.exception.car.CsvFileException;
 import com.name.vehicleregistration.model.Car;
 import com.name.vehicleregistration.repository.BrandRepository;
 import com.name.vehicleregistration.repository.CarRepository;
 import com.name.vehicleregistration.service.CarService;
 import com.name.vehicleregistration.service.converters.CarConverter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -30,24 +33,18 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
-    final CarRepository carRepository;
-    final CarConverter carConverter;
-    final BrandRepository brandRepository;
-
-    public CarServiceImpl(CarRepository carRepository, CarConverter carConverter, BrandRepository brandRepository) {
-        this.carRepository = carRepository;
-        this.carConverter = carConverter;
-        this.brandRepository = brandRepository;
-    }
+    private final CarRepository carRepository;
+    private final CarConverter carConverter;
+    private final BrandRepository brandRepository;
 
     @Override
     public Car addCar(CarRequest carRequest) {
         BrandEntity brandEntity = brandRepository.findById(carRequest.getBrandId())
-                .orElseThrow(() -> new BrandNotFoundException("Marca con ID " + carRequest.getBrandId() + " no encontrada."));
+                .orElseThrow(() -> new BrandNotFoundException("Brand with ID " + carRequest.getBrandId() + " not found."));
 
-        // Crear el CarEntity usando el BrandEntity encontrado
         CarEntity carEntity = CarEntity.builder()
                 .brand(brandEntity)
                 .model(carRequest.getModel())
@@ -60,26 +57,26 @@ public class CarServiceImpl implements CarService {
                 .numDoors(carRequest.getNumDoors())
                 .build();
         carEntity = carRepository.save(carEntity);
-        log.info("POST -> Coche añadido correctamente");
+        log.info("POST -> Car added successfully");
         return carConverter.toModel(carEntity);
     }
 
     @Override
     public Car getCarById(Integer id) {
         CarEntity carEntity = carRepository.findById(id)
-                .orElseThrow(() -> new CarNotFoundException("Coche con ID " + id + " no encontrado."));
-        log.info("GET -> Coche hallado correctamente");
+                .orElseThrow(() -> new CarNotFoundException("Car with ID " + id + " not found."));
+        log.info("GET -> Car found correctly");
         return carConverter.toModel(carEntity);
     }
 
     @Override
     public Car updateCar(Integer id, CarRequest carRequest) {
         CarEntity carEntity = carRepository.findById(id)
-                .orElseThrow(() -> new CarNotFoundException("Coche con ID " + id + " no encontrado."));
+                .orElseThrow(() -> new CarNotFoundException("Car with ID " + id + " not found."));
 
         Optional<BrandEntity> brandOptional = brandRepository.findById(carRequest.getBrandId());
         if (brandOptional.isEmpty()) {
-            throw new BrandNotFoundException("Marca con ID " + carRequest.getBrandId() + " no encontrada.");
+            throw new BrandNotFoundException("Brand with ID " + carRequest.getBrandId() + " not found.");
         }
         BrandEntity brandEntity = brandOptional.get();
         carEntity.setBrand(brandEntity);
@@ -93,34 +90,36 @@ public class CarServiceImpl implements CarService {
         carEntity.setNumDoors(carRequest.getNumDoors());
 
         carRepository.save(carEntity);
-        log.info("PUT -> Coche actualizado correctamente");
+        log.info("PUT -> Successfully updated car");
         return carConverter.toModel(carEntity);
     }
 
     @Override
     public Car deleteById(Integer id) {
         CarEntity carEntity = carRepository.findById(id)
-                .orElseThrow(() -> new CarNotFoundException("Coche con ID " + id + " no encontrado."));
+                .orElseThrow(() -> new CarNotFoundException("Car with ID " + id + " not found."));
         carRepository.deleteById(id);
-        log.info("DELETE -> Coche eliminado correctamente");
+        log.info("DELETE -> Car removed successfully");
         return carConverter.toModel(carEntity);
     }
 
     @Override
     @Async("taskExecutor")
     public CompletableFuture<List<Car>> getAll() {
-        log.info("GET -> Ejecutando en el hilo: {}", Thread.currentThread().getName());
+        log.info("GET -> Running in thread: {}", Thread.currentThread().getName());
         List<CarEntity> carEntityList = carRepository.findAll();
         List<Car> carsList = new ArrayList<>();
         carEntityList.forEach(car -> carsList.add(carConverter.toModel(car)));
-        log.info("GET -> Lista encontrada correctamente");
+        log.info("GET -> List found successfully");
         return CompletableFuture.completedFuture(carsList);
     }
 
     @Override
     public String carsCsv() {
         Pageable pageable = PageRequest.of(0, 100);
+
         List<CarEntity> carList = carRepository.findAll(pageable).getContent();
+
         StringBuilder csvContent = new StringBuilder();
 
         csvContent.append("Brand,Model,Colour,Description,ModelYear,Price,FuelType,NumDoors\n");
@@ -143,54 +142,47 @@ public class CarServiceImpl implements CarService {
     @Override
     public String uploadCars(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new CsvFileException("El archivo está vacío.");
+            throw new CsvFileException("The file is empty.");
         }
 
         if (!file.getOriginalFilename().contains(".csv")) {
-            throw new CsvFileException("El archivo no es un CSV válido.");
+            throw new CsvFileException("The file is not a valid CSV.");
         }
 
         List<CarEntity> carList = new ArrayList<>();
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
              CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withHeader())) {
 
-            // Itera sobre cada registro del archivo CSV
             for (CSVRecord record : csvParser) {
-                CarEntity car = mapCarFromCsv(record); // Mapeo de los datos de cada coche
+                CarEntity car = new CarEntity();
+
+                String brandName = record.get("brand");
+                BrandEntity brand = brandRepository.findByName(brandName);
+                if (brand == null) {
+                    throw new BrandNotFoundException("Brand not found: " + brandName);
+                }
+
+                car.setBrand(brand);
+                car.setModel(record.get("model"));
+                car.setMilleage(Integer.parseInt(record.get("milleage")));
+                car.setPrice(Double.parseDouble(record.get("price")));
+                car.setModelYear(Integer.parseInt(record.get("modelYear")));
+                car.setDescription(record.get("description"));
+                car.setColour(record.get("colour"));
+                car.setFuelType(record.get("fuelType"));
+                car.setNumDoors(Integer.parseInt(record.get("numDoors")));
+
                 carList.add(car);
             }
 
-            // Guarda los coches en la base de datos
             carRepository.saveAll(carList);
-            String msj = "Se han cargado y guardado " + carList.size() + " coches desde el archivo CSV.";
+            String msj =  carList.size() + " cars have been uploaded and saved from the CSV file.";
             log.info("POST -> {}", msj);
             return msj;
 
         } catch (IOException e) {
-            throw new CsvFileException("No se pudo leer el archivo CSV");
+            throw new CsvFileException("Could not read CSV file");
         }
     }
 
-    private CarEntity mapCarFromCsv(CSVRecord record) {
-        CarEntity car = new CarEntity();
-        // Verifica si la marca existe en la base de datos
-        String brandName = record.get("brand");
-        BrandEntity brand = brandRepository.findByName(brandName);
-        if (brand == null) {
-            throw new BrandNotFoundException("Marca no encontrada: " + brandName);
-        }
-
-        // Mapea los valores del CSV a la entidad CarEntity
-        car.setBrand(brand);
-        car.setModel(record.get("model"));
-        car.setMilleage(Integer.parseInt(record.get("milleage")));
-        car.setPrice(Double.parseDouble(record.get("price")));
-        car.setModelYear(Integer.parseInt(record.get("modelYear")));
-        car.setDescription(record.get("description"));
-        car.setColour(record.get("colour"));
-        car.setFuelType(record.get("fuelType"));
-        car.setNumDoors(Integer.parseInt(record.get("numDoors")));
-
-        return car;
-    }
 }

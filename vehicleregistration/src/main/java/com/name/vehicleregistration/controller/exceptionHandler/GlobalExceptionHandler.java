@@ -1,4 +1,4 @@
-package com.name.vehicleregistration.exception;
+package com.name.vehicleregistration.controller.exceptionHandler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
         ErrorResponse error = new ErrorResponse(
-                "Ocurrió un error inesperado: {}" + ex.getMessage(),
+                "An unexpected error occurred: {}" + ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 LocalDateTime.now()
         );

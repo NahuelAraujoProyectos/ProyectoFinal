@@ -1,4 +1,4 @@
-package com.name.vehicleregistration.exception.custom.car;
+package com.name.vehicleregistration.exception.car;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

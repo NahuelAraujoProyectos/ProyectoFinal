@@ -1,8 +1,8 @@
-package com.name.vehicleregistration.exception;
+package com.name.vehicleregistration.controller.exceptionHandler;
 
-import com.name.vehicleregistration.exception.custom.user.ImageStorageException;
-import com.name.vehicleregistration.exception.custom.user.InvalidImageFormatException;
-import com.name.vehicleregistration.exception.custom.user.UserNotFoundException;
+import com.name.vehicleregistration.exception.user.ImageStorageException;
+import com.name.vehicleregistration.exception.user.InvalidImageFormatException;
+import com.name.vehicleregistration.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

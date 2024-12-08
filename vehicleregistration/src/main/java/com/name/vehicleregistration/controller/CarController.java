@@ -3,10 +3,10 @@ package com.name.vehicleregistration.controller;
 import com.name.vehicleregistration.controller.mappers.CarMapper;
 import com.name.vehicleregistration.controller.dtos.CarRequest;
 import com.name.vehicleregistration.controller.dtos.CarResponse;
-import com.name.vehicleregistration.entity.CarEntity;
 import com.name.vehicleregistration.model.Car;
 import com.name.vehicleregistration.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,17 +23,13 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RestController
 @RequestMapping("/cars")
+@RequiredArgsConstructor
 public class CarController {
 
     final CarService carService;
     final CarMapper carMapper;
 
-    public CarController(CarService carService, CarMapper carMapper) {
-        this.carService = carService;
-        this.carMapper = carMapper;
-    }
-
-    @Operation(summary = "Llamada para añadir vehículos")
+    @Operation(summary = "Call to add vehicles.")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<CarResponse> addCar(@RequestBody CarRequest carRequest) {
@@ -42,7 +38,7 @@ public class CarController {
         return ResponseEntity.ok(carResponse);
     }
 
-    @Operation (summary = "Llamada para obtener lista de coches")
+    @Operation (summary = "Call for car list.")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/get")
     public CompletableFuture<?> carList() throws Exception {
@@ -52,7 +48,7 @@ public class CarController {
         return CompletableFuture.completedFuture(carResponsesList);
     }
 
-    @Operation (summary = "Llamada para obtener coche por id")
+    @Operation (summary = "Call to obtain car by ID.")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/get/{id}")
     public ResponseEntity<CarResponse> getCar(@PathVariable Integer id) {
@@ -60,7 +56,7 @@ public class CarController {
         return ResponseEntity.ok(carResponse);
     }
 
-    @Operation (summary = "Llamada para actualizar coche por id")
+    @Operation (summary = "Call to update car by ID.")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/put/{id}")
     public ResponseEntity<CarResponse> putCar (@PathVariable Integer id, @RequestBody CarRequest carRequest){
@@ -68,7 +64,7 @@ public class CarController {
         return ResponseEntity.ok(carResponse);
     }
 
-    @Operation (summary = "Llamada para eliminar coche por id")
+    @Operation (summary = "Call to delete car by ID.")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<CarResponse> deleteCar (@PathVariable Integer id){
@@ -76,7 +72,7 @@ public class CarController {
         return ResponseEntity.ok(carResponse);
     }
 
-    @Operation (summary = "Llamada para descargar lista de coches")
+    @Operation (summary = "Call to download car list.")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/downloadCars")
     public ResponseEntity<?> downloadCars(){
@@ -88,7 +84,7 @@ public class CarController {
         return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
     }
 
-    @Operation(summary = "Llamada para cargar una lista de coches desde un archivo CSV")
+    @Operation(summary = "Call to load a list of cars from a CSV file.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/uploadCsv")
     public ResponseEntity<?> uploadCsv(@RequestParam("file") MultipartFile file) {

@@ -61,17 +61,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            log.error("Error - El token JWT ha expirado: {}", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Código 401
-            response.getWriter().write("El token JWT ha expirado. Por favor, inicie sesión nuevamente.");
+            log.error("Error - JWT token has expired: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("The JWT token has expired. Please log in again.");
         } catch (io.jsonwebtoken.MalformedJwtException e) {
-            log.error("Error - El token JWT no es válido: {}", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Código 400
-            response.getWriter().write("El token JWT no es válido.");
+            log.error("Error - JWT token is invalid: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("JWT token is invalid.");
         } catch (Exception e) {
-            log.error("Error - Token JWT inválido: {}", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Código 401
-            response.getWriter().write("Token JWT inválido. No se pudo validar la firma.");
+            log.error("Error - Invalid JWT Token: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid JWT token. The signature could not be validated.");
         }
     }
 }

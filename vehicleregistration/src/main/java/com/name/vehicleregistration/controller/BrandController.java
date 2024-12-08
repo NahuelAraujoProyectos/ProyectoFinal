@@ -6,6 +6,7 @@ import com.name.vehicleregistration.controller.mappers.BrandMapper;
 import com.name.vehicleregistration.model.Brand;
 import com.name.vehicleregistration.service.BrandService;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,17 +19,13 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RestController
 @RequestMapping("/brands")
+@RequiredArgsConstructor
 public class BrandController {
 
     private final BrandService brandService;
     private final BrandMapper brandMapper;
 
-    public BrandController(BrandService brandService, BrandMapper brandMapper) {
-        this.brandService = brandService;
-        this.brandMapper = brandMapper;
-    }
-
-    @Operation(summary = "Añadir una nueva marca")
+    @Operation(summary = "Add a new brand.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<BrandResponse> addBrand(@RequestBody BrandRequest brandRequest){
@@ -36,7 +33,7 @@ public class BrandController {
         return ResponseEntity.ok(brandMapper.toResponse(brand));
     }
 
-    @Operation(summary = "Obtener todas las marcas")
+    @Operation(summary = "Get all brands.")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/get")
     public CompletableFuture<List<BrandResponse>> getAllBrands() throws Exception {
@@ -46,7 +43,7 @@ public class BrandController {
         return CompletableFuture.completedFuture(listResponse);
     }
 
-    @Operation(summary = "Obtener marca por ID")
+    @Operation(summary = "Edit brand by ID.")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/get/{id}")
     public ResponseEntity<BrandResponse> getBrand(@PathVariable Integer id){
@@ -54,7 +51,7 @@ public class BrandController {
         return ResponseEntity.ok(brandMapper.toResponse(brand));
     }
 
-    @Operation(summary = "Editar una marca por ID")
+    @Operation(summary = "Get brand by ID.")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/put/{id}")
     public ResponseEntity<BrandResponse> putBrand(@PathVariable Integer id, @RequestBody BrandRequest brandRequest){
@@ -62,12 +59,12 @@ public class BrandController {
         return ResponseEntity.ok(brandMapper.toResponse(brand));
     }
 
-    @Operation(summary = "Eliminar una marca por ID")
+    @Operation(summary = "Delete a mark by ID.")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<BrandResponse> deleteBrand(@PathVariable Integer id){
-        Brand brand = brandService.deleteBrand(id); // Lógica para eliminar
-        BrandResponse response = brandMapper.toResponse(brand); // Asegúrate de que response tiene el campo "name"
+        Brand brand = brandService.deleteBrand(id);
+        BrandResponse response = brandMapper.toResponse(brand);
         return ResponseEntity.ok(response);
     }
 }

@@ -11,8 +11,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI(){
         return new OpenAPI()
                 .info(new Info()
-                        .title("Registro API")
+                        .title("Vehicle Registration API")
                         .version("1.0")
-                        .description("Api para registrar"));
+                        .description("API to register vehicles and clients"));
     }
 }

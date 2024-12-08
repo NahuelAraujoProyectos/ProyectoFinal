@@ -1,4 +1,4 @@
-package com.name.vehicleregistration.exception;
+package com.name.vehicleregistration.controller.exceptionHandler;
 
 import lombok.*;
 import org.springframework.http.HttpStatus;
@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ErrorResponse {
     private String message;
     private HttpStatus status;

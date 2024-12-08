@@ -1,27 +1,34 @@
 package com.name.vehicleregistration.service.impl;
 
-import com.name.vehicleregistration.entity.ProfileEntity;
 import com.name.vehicleregistration.entity.UserEntity;
-import com.name.vehicleregistration.exception.custom.user.UserNotFoundException;
+import com.name.vehicleregistration.exception.user.ImageStorageException;
+import com.name.vehicleregistration.exception.user.InvalidImageFormatException;
+import com.name.vehicleregistration.exception.user.UserNotFoundException;
 import com.name.vehicleregistration.model.User;
 import com.name.vehicleregistration.repository.UserRepository;
 import com.name.vehicleregistration.service.converters.UserConverter;
-import com.name.vehicleregistration.utils.RoleUtils;
+import com.name.vehicleregistration.service.utils.RoleUtils;
+import io.jsonwebtoken.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest {
+class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
@@ -177,5 +184,73 @@ public class UserServiceImplTest {
         });
     }
 
+    @Test
+    void getUserImage_test() {
+        // Given
+        Integer userId = 1;
+        String encodedImage = Base64.getEncoder().encodeToString("imageBytes".getBytes(StandardCharsets.UTF_8));
+        UserEntity userEntity = UserEntity.builder().id(userId).image(encodedImage).build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+
+        // When
+        byte[] image = userService.getUserImage(userId);
+
+        // Then
+        assertArrayEquals("imageBytes".getBytes(StandardCharsets.UTF_8), image);
+    }
+
+    @Test
+    void getUserImage_ko_userNotFound() {
+        // Given
+        Integer userId = 1;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.getUserImage(userId));
+        assertEquals("User not found with ID: 1", exception.getMessage());
+    }
+
+    @Test
+    void getUserImage_ko_invalidImageFormat() {
+        // Given
+        Integer userId = 1;
+        UserEntity userEntity = UserEntity.builder().id(userId).image("invalidBase64").build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+
+        // When & Then
+        InvalidImageFormatException exception = assertThrows(InvalidImageFormatException.class, () -> userService.getUserImage(userId));
+        assertEquals("Formato de imagen incorrecto para el usuario con id 1", exception.getMessage());
+    }
+
+    @Test
+    void addUserImage_test() throws IOException {
+        // Given
+        Integer userId = 1;
+        UserEntity userEntity = UserEntity.builder().id(userId).build();
+        MultipartFile file = new MockMultipartFile("file", "image.png", "image/png", "imageBytes".getBytes(StandardCharsets.UTF_8));
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+
+        // When
+        userService.addUserImage(userId, file);
+
+        // Then
+        assertEquals(Base64.getEncoder().encodeToString("imageBytes".getBytes(StandardCharsets.UTF_8)), userEntity.getImage());
+    }
+
+    @Test
+    void addUserImage_ko_userNotFound() {
+        // Given
+        Integer userId = 1;
+        MultipartFile file = new MockMultipartFile("file", "image.png", "image/png", "imageBytes".getBytes(StandardCharsets.UTF_8));
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // When & Then
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.addUserImage(userId, file));
+        assertEquals("No se encontró usuario con id  1", exception.getMessage());
+    }
 
 }

@@ -1,8 +1,8 @@
 package com.name.vehicleregistration.service.impl;
 
 import com.name.vehicleregistration.entity.BrandEntity;
-import com.name.vehicleregistration.exception.custom.brand.BrandAlreadyExistsException;
-import com.name.vehicleregistration.exception.custom.brand.BrandNotFoundException;
+import com.name.vehicleregistration.exception.brand.BrandAlreadyExistsException;
+import com.name.vehicleregistration.exception.brand.BrandNotFoundException;
 import com.name.vehicleregistration.model.Brand;
 import com.name.vehicleregistration.repository.BrandRepository;
 import com.name.vehicleregistration.service.converters.BrandConverter;

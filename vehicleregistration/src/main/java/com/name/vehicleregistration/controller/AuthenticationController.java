@@ -18,18 +18,18 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @Operation (summary = "Llamada para registrar usuario")
+    @Operation (summary = "Call to register user.")
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody SignUpRequest signUpRequest){
         LoginResponse token = authenticationService.signup(signUpRequest);
-        log.info("POST -> Perfil registrado correctamente.");
+        log.info("POST -> Profile registered correctly.");
         return ResponseEntity.ok(token);
     }
 
-    @Operation (summary = "Llamada para logar usuario")
+    @Operation (summary = "Call to login user.")
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest loginRequest) {
-        log.info("POST -> Perfil encontrado correctamente.");
+        log.info("POST -> Profile found successfully.");
         return ResponseEntity.ok(authenticationService.login(loginRequest));
     }
 }

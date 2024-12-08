@@ -1,7 +1,7 @@
-package com.name.vehicleregistration.exception;
+package com.name.vehicleregistration.controller.exceptionHandler;
 
-import com.name.vehicleregistration.exception.custom.brand.BrandAlreadyExistsException;
-import com.name.vehicleregistration.exception.custom.brand.BrandNotFoundException;
+import com.name.vehicleregistration.exception.brand.BrandAlreadyExistsException;
+import com.name.vehicleregistration.exception.brand.BrandNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -55,46 +55,57 @@ class BrandControllerTest {
     @WithMockUser(username = "admin", password = "mmm", roles = "ADMIN")
     void addBrand_test() throws Exception {
         // Given
-        BrandRequest brandRequest = new BrandRequest();
-        brandRequest.setName("Marca Nueva");
+        BrandRequest brandRequest = BrandRequest.builder()
+                .name("BrandTest")
+                .build();
 
-        Brand brand = new Brand();
-        brand.setId(1);
-        brand.setName("Marca Nueva");
+        Brand brand = Brand.builder()
+                .id(1)
+                .name("BrandTest")
+                .build();
 
-        BrandResponse brandResponse = new BrandResponse();
-        brandResponse.setId(1);
-        brandResponse.setName("Marca Nueva");
+        BrandResponse brandResponse = BrandResponse.builder()
+                .id(1)
+                .name("BrandTest")
+                .build();
 
         // When
+        when(brandMapper.toModel(brandRequest)).thenReturn(brand);
         when(brandService.addBrand(brand)).thenReturn(brand);
         when(brandMapper.toResponse(brand)).thenReturn(brandResponse);
 
         // Then
         mockMvc.perform(post("/brands/add")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Marca Nueva\"}")
+                        .content("{\"name\":\"BrandTest\"}")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Marca Nueva")));
+                .andExpect(jsonPath("$.name", is("BrandTest")));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "mmm", roles = "ADMIN")
     void getBrandById_test() throws Exception {
         // Crear un objeto Brand para simular la respuesta del servicio
-        Brand brand = new Brand();
-        brand.setId(1);
-        brand.setName("MarcaTest");
+        Brand brand = Brand.builder()
+                .id(1)
+                .name("BrandTest")
+                .build();
+
+        BrandResponse brandResponse = BrandResponse.builder()
+                .id(1)
+                .name("BrandTest")
+                .build();
 
         // Configuración de mock para el servicio y mapper
         when(brandService.getBrandById(1)).thenReturn(brand);
+        when(brandMapper.toResponse(brand)).thenReturn(brandResponse);
 
         // Realizar la solicitud GET
         mockMvc.perform(get("/brands/get/{id}", 1)
-                        .with(csrf())) // Incluye CSRF si es necesario
-                .andExpect(status().isOk()) // Verifica que el estado de la respuesta es 200 OK
-                .andExpect(jsonPath("$.name", is("MarcaTest"))); // Verifica que el nombre coincide
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("BrandTest")));
     }
 
     @Test
@@ -134,18 +145,25 @@ class BrandControllerTest {
     @WithMockUser(username = "admin", password = "mmm", roles = "ADMIN")
     void deleteBrand_test() throws Exception {
         // Given
-        Brand brand = new Brand();
-        brand.setId(1);
-        brand.setName("MarcaEliminada");
+        Brand brand = Brand.builder()
+                .id(1)
+                .name("BrandTest")
+                .build();
+
+        BrandResponse brandResponse = BrandResponse.builder()
+                .id(1)
+                .name("BrandTest")
+                .build();
 
         // When
         when(brandService.deleteBrand(1)).thenReturn(brand);
+        when(brandMapper.toResponse(brand)).thenReturn(brandResponse);
 
         // Then
         mockMvc.perform(delete("/brands/delete/{id}", 1)
-                        .with(csrf())) // Incluye CSRF si es necesario
-                .andExpect(status().isOk()) // Verifica que el estado de la respuesta es 200 OK
-                .andExpect(jsonPath("$.name", is("MarcaEliminada"))); // Verifica que el nombre de la marca eliminada es correcto
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("BrandTest")));
     }
 
 }

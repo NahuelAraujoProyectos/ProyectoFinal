@@ -1,8 +1,8 @@
-package com.name.vehicleregistration.exception;
+package com.name.vehicleregistration.controller.exceptionHandler;
 
-import com.name.vehicleregistration.exception.custom.authentication.EmailAlreadyInUseException;
-import com.name.vehicleregistration.exception.custom.authentication.InvalidCredentialsException;
-import com.name.vehicleregistration.exception.custom.authentication.UserNotFoundException;
+import com.name.vehicleregistration.exception.authentication.EmailAlreadyInUseException;
+import com.name.vehicleregistration.exception.authentication.InvalidCredentialsException;
+import com.name.vehicleregistration.exception.authentication.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class EAuthenticationExceptionHandler {
                 HttpStatus.CONFLICT,
                 LocalDateTime.now()
         );
-        log.error(error.toString());
+        log.error("Error - email is already in use: {}",ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
@@ -32,7 +32,7 @@ public class EAuthenticationExceptionHandler {
                 HttpStatus.UNAUTHORIZED,
                 LocalDateTime.now()
         );
-        log.error(error.toString());
+        log.error("Error - invalid credentials: {}",ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
@@ -43,7 +43,7 @@ public class EAuthenticationExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 LocalDateTime.now()
         );
-        log.error(error.toString());
+        log.error("Error - user not found: {}", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 }

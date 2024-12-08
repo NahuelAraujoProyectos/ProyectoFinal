@@ -1,10 +1,8 @@
-package com.name.vehicleregistration.exception;
+package com.name.vehicleregistration.controller.exceptionHandler;
 
-import com.name.vehicleregistration.exception.custom.car.CarNotFoundException;
-import com.name.vehicleregistration.exception.custom.car.BrandNotFoundException;
-import com.name.vehicleregistration.exception.custom.car.DataMappingException;
-import com.name.vehicleregistration.exception.custom.car.DatabaseSaveException;
-import com.name.vehicleregistration.exception.custom.car.CsvFileException;
+import com.name.vehicleregistration.exception.car.CarNotFoundException;
+import com.name.vehicleregistration.exception.car.BrandNotFoundException;
+import com.name.vehicleregistration.exception.car.CsvFileException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,28 +35,6 @@ public class ECarExceptionHandler {
         );
         log.error("Error - brand not found: {}", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(DataMappingException.class)
-    public ResponseEntity<ErrorResponse> handleDataMappingException(DataMappingException ex) {
-        ErrorResponse error = new ErrorResponse(
-                ex.getMessage(),
-                HttpStatus.BAD_REQUEST,
-                LocalDateTime.now()
-        );
-        log.error("Error - Data mapping failed: {}", ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DatabaseSaveException.class)
-    public ResponseEntity<ErrorResponse> handleDatabaseSaveException(DatabaseSaveException ex) {
-        ErrorResponse error = new ErrorResponse(
-                ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                LocalDateTime.now()
-        );
-        log.error("Error - Database save failed: {}", ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(CsvFileException.class)

@@ -4,14 +4,13 @@ import com.name.vehicleregistration.controller.dtos.LoginRequest;
 import com.name.vehicleregistration.controller.dtos.LoginResponse;
 import com.name.vehicleregistration.controller.dtos.SignUpRequest;
 import com.name.vehicleregistration.entity.UserEntity;
-import com.name.vehicleregistration.exception.custom.authentication.EmailAlreadyInUseException;
+import com.name.vehicleregistration.exception.authentication.EmailAlreadyInUseException;
 import com.name.vehicleregistration.repository.UserRepository;
 import com.name.vehicleregistration.service.AuthenticationService;
-import com.name.vehicleregistration.exception.custom.authentication.InvalidCredentialsException;
-import com.name.vehicleregistration.exception.custom.authentication.UserNotFoundException;
-import com.name.vehicleregistration.utils.RoleUtils;
+import com.name.vehicleregistration.exception.authentication.InvalidCredentialsException;
+import com.name.vehicleregistration.exception.authentication.UserNotFoundException;
+import com.name.vehicleregistration.service.utils.RoleUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,16 +18,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final PasswordEncoder passwordEncoder;
-    @Autowired
     private final RoleUtils roleUtils;
 
     public LoginResponse signup(SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new EmailAlreadyInUseException("Email " + signUpRequest.getEmail() + " ya está en uso.");
+            throw new EmailAlreadyInUseException("Email " + signUpRequest.getEmail() + " is already in use.");
         }
 
         UserEntity userEntity = UserEntity
@@ -47,21 +43,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public LoginResponse login(LoginRequest loginRequest) {
         try {
-            // Intentar autenticar al usuario sin usar excepciones de Spring Security
             var user = userRepository.findByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new UserNotFoundException("Email incorrecto."));
+                    .orElseThrow(() -> new UserNotFoundException("Incorrect email."));
 
-            // Verificar la contraseña manualmente
             if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-                throw new InvalidCredentialsException("Contraseña incorrecta.");
+                throw new InvalidCredentialsException("Incorrect password.");
             }
 
             var jwt = JwtService.generateToken(user);
             return LoginResponse.builder().token(jwt).build();
         } catch (UserNotFoundException | InvalidCredentialsException e) {
-            throw e; // Re-lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
-            throw new InvalidCredentialsException("Error al intentar iniciar sesión.");
+            throw new InvalidCredentialsException("Error trying to log in.");
         }
     }
 }

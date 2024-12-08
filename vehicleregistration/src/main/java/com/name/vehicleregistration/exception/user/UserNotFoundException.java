@@ -1,4 +1,4 @@
-package com.name.vehicleregistration.exception.custom.user;
+package com.name.vehicleregistration.exception.user;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

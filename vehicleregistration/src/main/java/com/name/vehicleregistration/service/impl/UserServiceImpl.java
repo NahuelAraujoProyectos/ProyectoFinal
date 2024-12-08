@@ -1,15 +1,16 @@
 package com.name.vehicleregistration.service.impl;
 
 import com.name.vehicleregistration.entity.UserEntity;
-import com.name.vehicleregistration.exception.custom.user.ImageStorageException;
-import com.name.vehicleregistration.exception.custom.user.InvalidImageFormatException;
-import com.name.vehicleregistration.exception.custom.user.UserNotFoundException;
+import com.name.vehicleregistration.exception.user.ImageStorageException;
+import com.name.vehicleregistration.exception.user.InvalidImageFormatException;
+import com.name.vehicleregistration.exception.user.UserNotFoundException;
 import com.name.vehicleregistration.model.User;
 import com.name.vehicleregistration.repository.UserRepository;
 import com.name.vehicleregistration.service.UserService;
 import com.name.vehicleregistration.service.converters.UserConverter;
-import com.name.vehicleregistration.utils.RoleUtils;
-import com.name.vehicleregistration.utils.SecurityUtils;
+import com.name.vehicleregistration.service.utils.RoleUtils;
+import com.name.vehicleregistration.service.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,21 +22,26 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    final UserConverter userConverter;
-    final RoleUtils roleUtils;
-
-    public UserServiceImpl(UserRepository userRepository, UserConverter userConverter, RoleUtils roleUtils) {
-        this.userRepository = userRepository;
-        this.userConverter = userConverter;
-        this.roleUtils = roleUtils;
-    }
+    private final UserConverter userConverter;
+    private final RoleUtils roleUtils;
 
     @Override
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Override
+    public UserEntity save(UserEntity userEntity) {
+        return userRepository.save(userEntity);
+    }
+
+    @Override
+    public Optional<UserEntity> getUserById(Integer id) {
+        return userRepository.findById(id);
     }
 
     @Override
@@ -46,7 +52,7 @@ public class UserServiceImpl implements UserService {
             User user = userConverter.toModel(userEntity);
             listUser.add(user);
         }
-        log.info("GET -> Lista de perfiles obtenida correctamente");
+        log.info("GET -> Profile list successfully obtained");
         return listUser;
     }
 
@@ -54,24 +60,24 @@ public class UserServiceImpl implements UserService {
     public User getProfile() {
         UserEntity userEntity = SecurityUtils.getAuthenticatedUser();
         if (userEntity == null) {
-            throw new UserNotFoundException("No se pudo obtener datos del perfil");
+            throw new UserNotFoundException("Could not get profile data");
         }
-        log.info("GET -> Perfil personal obtenido correctamente");
+        log.info("GET -> Personal profile obtained correctly");
         return userConverter.toModel(userEntity);
     }
 
     @Override
     public User getProfileById(Integer id) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Perfil con ID " + id + " no encontrado."));
-        log.info("GET -> Perfil obtenido correctamente");
+                .orElseThrow(() -> new UserNotFoundException("Profile with ID " + id + " not found."));
+        log.info("GET -> Profile obtained correctly");
         return userConverter.toModel(userEntity);
     }
 
     @Override
     public User putProfile(Integer id, User user) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Perfil con ID " + id + " no encontrado."));
+                .orElseThrow(() -> new UserNotFoundException("Profile with ID " + id + " not found."));
 
         userEntity.setFullName(user.getFullName());
         userEntity.setEmail(user.getEmail());
@@ -79,22 +85,17 @@ public class UserServiceImpl implements UserService {
         userEntity.setUpdatedAt(new Date().toString());
 
         userRepository.save(userEntity);
-        log.info("PUT -> Perfil editado correctamente");
+        log.info("PUT -> Successfully edited profile");
         return userConverter.toModel(userEntity);
     }
 
     @Override
     public User deleteProfile(Integer id) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Perfil con ID " + id + " no encontrado."));
+                .orElseThrow(() -> new UserNotFoundException("Profile with ID " + id + " not found."));
         userRepository.deleteById(id);
-        log.info("DELETE -> Perfil elimminado correctamente");
+        log.info("DELETE -> Profile deleted successfully");
         return userConverter.toModel(userEntity);
-    }
-
-    @Override
-    public UserEntity save(UserEntity userEntity) {
-        return userRepository.save(userEntity);
     }
 
     @Override
@@ -102,29 +103,25 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
         try {
-            log.info("GET -> Imagen obtenida con existo");
+            log.info("GET -> Image obtained successfully");
             return Base64.getDecoder().decode(entity.getImage());
         } catch (IllegalArgumentException e) {
-            throw new InvalidImageFormatException("Formato de imagen incorrecto para el usuario con id " + id);
+            throw new InvalidImageFormatException("Incorrect image format for user with id " + id);
         }
     }
 
     @Override
     public void addUserImage(Integer id, MultipartFile file) {
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("No se encontró usuario con id  " + id));
+                .orElseThrow(() -> new UserNotFoundException("No user with id " + id + " found"));
         try {
-            log.info("POST -> Imagen guardada en el Usuario con id {}.", id);
+            log.info("POST -> Image saved in User with id {}.", id);
             String encodedImage = Base64.getEncoder().encodeToString(file.getBytes());
             userEntity.setImage(encodedImage);
             userRepository.save(userEntity);
         } catch (IOException e) {
-            throw new ImageStorageException ("No se pudo guardar la imagen del usuario con id " + id,e);
+            throw new ImageStorageException ("Could not save user image with id " + id,e);
         }
     }
 
-    @Override
-    public Optional<UserEntity> getUserById(Integer id) {
-        return userRepository.findById(id);
-    }
 }

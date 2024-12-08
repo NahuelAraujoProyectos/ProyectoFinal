@@ -6,6 +6,7 @@ import com.name.vehicleregistration.controller.mappers.UserMapper;
 import com.name.vehicleregistration.model.User;
 import com.name.vehicleregistration.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,20 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
-@Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
     final UserService userService;
     final UserMapper userMapper;
 
-    public UserController(UserService userService, UserMapper userMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
-
-    @Operation(summary = "Llamada para obtener lista de perfiles")
+    @Operation(summary = "Call to obtain profile list")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get")
     public ResponseEntity<?> getAllProfile(){
@@ -44,7 +41,7 @@ public class UserController {
         return ResponseEntity.ok(listResponse);
     }
 
-    @Operation(summary = "Llamada para obtener datos de perfil actual")
+    @Operation(summary = "Call to get current profile data")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/get/me")
     public ResponseEntity<?> getAuthenticatedUser() {
@@ -52,7 +49,7 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    @Operation(summary = "Llamada para obtener perfil por ID")
+    @Operation(summary = "Call to obtain profile by ID")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getProfileById(@PathVariable Integer id){
@@ -60,7 +57,7 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    @Operation(summary = "Llamada para editar marca por ID")
+    @Operation(summary = "Call to edit brand by ID")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/put/{id}")
     public ResponseEntity<?> putBrand(@PathVariable Integer id, @RequestBody UserRequest userRequest){
@@ -68,7 +65,7 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    @Operation(summary = "Llamada para eliminar perfil por ID")
+    @Operation(summary = "Call to delete profile by ID")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProfile (@PathVariable Integer id){
@@ -76,7 +73,7 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    @Operation(summary = "Llamada para descargar imagen")
+    @Operation(summary = "Call to download image")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @GetMapping("/downloadPhoto/{id}")
     public ResponseEntity<?> downloadUserPhoto(@PathVariable("id") Integer id) {
@@ -91,7 +88,7 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "Llamada para subir imagen")
+    @Operation(summary = "Call to upload image")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     @PostMapping("/userImage/{id}/add")
     public ResponseEntity<String> addUserImage(@PathVariable Integer id, @RequestParam("imageFile") MultipartFile imageFile) {
