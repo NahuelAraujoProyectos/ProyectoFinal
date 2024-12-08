@@ -8,6 +8,7 @@ Una API RESTful desarrollada con **Spring Boot** para la gestión de usuarios y 
 - [Requisitos previos](#requisitos-previos)
 - [Instalación](#instalación)
 - [Uso](#uso)
+- [Documentación con Swagger](#documentación-con-swagger)
 - [Contribuir](#contribuir)
 - [Licencia](#licencia)
 
@@ -19,7 +20,8 @@ El proyecto **Vehicle Registration API** permite gestionar usuarios con roles y 
 
 - Autenticación y autorización con **Spring Security** y **JWT**.
 - API RESTful para gestionar usuarios y vehículos.
-- Base de datos en memoria H2 para simplicidad en desarrollo.
+- Base de datos en memoria **H2** para simplicidad en desarrollo.
+- Documentación interactiva de la API con **Swagger UI**.
 - Validaciones personalizadas y manejo centralizado de excepciones.
 - Estructura modular para facilitar la escalabilidad.
 
@@ -28,7 +30,6 @@ El proyecto **Vehicle Registration API** permite gestionar usuarios con roles y 
 Asegúrate de tener lo siguiente instalado en tu máquina:
 - **Java 17** o superior
 - **Maven** (opcional si usas IDEs como IntelliJ)
-- **Docker** (para la base de datos)
 - Un cliente API como Postman o cURL para probar los endpoints
 
 ## Instalación
@@ -47,7 +48,7 @@ Asegúrate de tener lo siguiente instalado en tu máquina:
    URL: http://localhost:8080/h2-console
    JDBC URL: jdbc:h2:mem:testdb
    Usuario: sa
-   Contraseña: (deja este campo vacío)
+   Contraseña: password
    Desde la consola puedes consultar las tablas y datos.
 
 ## Uso
@@ -65,6 +66,15 @@ Gestión de vehículos
     POST /api/vehicles: Crea un registro de vehículo.
     GET /api/vehicles: Lista todos los vehículos.
 
+## Documentación con Swagger
+Swagger UI está habilitado para documentar y probar la API. 
+- Puedes acceder a la interfaz en:
+    URL: http://localhost:8080/swagger-ui.html
+
+- Para obtener los esquemas JSON de la API, puedes usar:
+    OpenAPI Docs: http://localhost:8080/api-docs
+
+Swagger facilita explorar y probar los endpoints directamente desde el navegador.
 
 ## Contribuir
 
@@ -93,3 +103,9 @@ Gestión de vehículos
    git push origin feature/nueva-funcionalidad
 
 10. Abre un Pull Request desde tu repositorio forkeado hacia el repositorio principal.
+
+## Licencia
+
+Este proyecto está licenciado bajo la [Licencia GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html), lo que significa que puedes usar, modificar y distribuir el código bajo los términos de la GPL-3.0. 
+
+Para más detalles, consulta el archivo [LICENSE](LICENSE) en este repositorio.
