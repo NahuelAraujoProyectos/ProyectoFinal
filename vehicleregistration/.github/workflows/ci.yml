@@ -1,0 +1,37 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar Java
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # Paso 3: Configurar variable JWT_SECRET (importante para pruebas)
+      - name: Set JWT_SECRET environment variable
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
+      # Paso 4: Construir el proyecto
+      - name: Build with Maven
+        run: mvn clean install
+
+      # Paso 5: Ejecutar las pruebas
+      - name: Run tests
+        run: mvn test -e
